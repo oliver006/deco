@@ -188,12 +188,22 @@ func (c *Client) DeviceList() (*DeviceListResp, error) {
 	return &result, nil
 }
 
-// ClientList returns the list of connected devices
+// ClientList returns the list of connected devices.
 func (c *Client) ClientList() (*ClientListResp, error) {
+	return c.ClientListForDevice("default")
+}
+
+// ClientListForDevice returns the list of devices connected to a specific Deco.
+// Passing "default" returns all connected devices in the mesh.
+func (c *Client) ClientListForDevice(deviceMAC string) (*ClientListResp, error) {
+	if deviceMAC == "" {
+		deviceMAC = "default"
+	}
+
 	var result ClientListResp
 	request := request{
 		Operation: "read",
-		Params:    map[string]interface{}{"device_mac": "default"},
+		Params:    map[string]interface{}{"device_mac": deviceMAC},
 	}
 	jsonRequest, _ := json.Marshal(request)
 	err := c.doEncryptedPost(fmt.Sprintf(";stok=%s/admin/client", c.stok), EndpointArgs{form: "client_list"}, jsonRequest, false, &result)
