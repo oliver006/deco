@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/mrmarble/deco"
+	"github.com/oliver006/deco"
 )
 
 const applicationVersion = "1.0.4"

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mrmarble/deco/utils"
+	"github.com/oliver006/deco/utils"
 )
 
 const (
