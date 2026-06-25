@@ -168,6 +168,10 @@ func (c *Client) doPost(path string, params EndpointArgs, body []byte, result in
 
 	defer res.Body.Close()
 
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", res.StatusCode)
+	}
+
 	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
 		return err
 	}
