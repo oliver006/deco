@@ -53,4 +53,3 @@ func printDecos(c *deco.Client) {
 		fmt.Printf("%s\tStatus: %s\n", device.DeviceIP, device.InetStatus)
 	}
 }
-
