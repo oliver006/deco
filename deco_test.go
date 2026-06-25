@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/oliver006/deco/utils"
 )
@@ -26,6 +27,44 @@ func TestEndpointArgsQueryParams(t *testing.T) {
 
 	if got.Get("form") != "performance" {
 		t.Fatalf("expected form=performance; got %q", got.Get("form"))
+	}
+}
+
+func TestNewUsesDefaultTimeout(t *testing.T) {
+	oldBaseURL := baseURL
+	t.Cleanup(func() {
+		baseURL = oldBaseURL
+	})
+
+	client := New("deco.local")
+
+	if client.c.Timeout != 30*time.Second {
+		t.Fatalf("expected default timeout 30s; got %s", client.c.Timeout)
+	}
+	if client.c.Jar == nil {
+		t.Fatal("expected cookie jar")
+	}
+	if baseURL.Host != "deco.local" {
+		t.Fatalf("expected base URL host deco.local; got %q", baseURL.Host)
+	}
+}
+
+func TestNewWithTimeoutUsesProvidedTimeout(t *testing.T) {
+	oldBaseURL := baseURL
+	t.Cleanup(func() {
+		baseURL = oldBaseURL
+	})
+
+	client := NewWithTimeout("deco.local", 5*time.Second)
+
+	if client.c.Timeout != 5*time.Second {
+		t.Fatalf("expected custom timeout 5s; got %s", client.c.Timeout)
+	}
+	if client.c.Jar == nil {
+		t.Fatal("expected cookie jar")
+	}
+	if baseURL.Host != "deco.local" {
+		t.Fatalf("expected base URL host deco.local; got %q", baseURL.Host)
 	}
 }
 

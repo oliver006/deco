@@ -111,10 +111,15 @@ type PerfResp struct {
 	} `json:"result"`
 }
 
-// New creates a new Go client for the Deco-m4 API
+// New creates a new Go client for the Deco-m4 API.
 func New(target string) *Client {
+	return NewWithTimeout(target, 30*time.Second)
+}
+
+// NewWithTimeout creates a new Go client for the Deco-m4 API with a custom HTTP client timeout.
+func NewWithTimeout(target string, timeout time.Duration) *Client {
 	jar, _ := cookiejar.New(nil)
-	c := &http.Client{Timeout: 30 * time.Second, Jar: jar}
+	c := &http.Client{Timeout: timeout, Jar: jar}
 
 	baseURL.Host = target
 
