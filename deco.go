@@ -62,10 +62,17 @@ type EndpointArgs struct {
 	form string
 }
 
+// NewEndpointArgs creates endpoint query arguments for form-based API calls.
+func NewEndpointArgs(form string) EndpointArgs {
+	return EndpointArgs{form: form}
+}
+
 func (e *EndpointArgs) queryParams() url.Values {
 	q := make(url.Values)
 
-	q.Add("form", e.form)
+	if e.form != "" {
+		q.Add("form", e.form)
+	}
 	return q
 }
 
