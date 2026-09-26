@@ -216,7 +216,7 @@ func TestClientListForDeviceSendsEncryptedRequestAndDecodesNames(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to encrypt response: %v", err)
 				}
-				responseBody, err := json.Marshal(response{Data: encrypted})
+				responseBody, err := json.Marshal(response{Data: &encrypted})
 				if err != nil {
 					t.Fatalf("failed to marshal response: %v", err)
 				}

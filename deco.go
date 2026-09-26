@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rsa"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -12,6 +13,9 @@ import (
 )
 
 var (
+	// ErrAuthentication indicates a rejected or expired Deco session.
+	ErrAuthentication = errors.New("deco authentication required")
+
 	// {"operation": "read"}
 	readBody []byte = []byte{123, 34, 111, 112, 101, 114, 97, 116, 105, 111, 110, 34, 58, 34, 114, 101, 97, 100, 34, 125}
 )
@@ -49,7 +53,7 @@ type loginResponse struct {
 }
 
 type response struct {
-	Data string `json:"data"`
+	Data *string `json:"data"`
 }
 
 type request struct {
@@ -150,7 +154,14 @@ func (c *Client) doEncryptedPost(path string, params EndpointArgs, body []byte, 
 	if err != nil {
 		return err
 	}
-	decoded, err := utils.AES256Decrypt(req.Data, *c.aes)
+	if req.Data == nil {
+		return errors.New("missing encrypted response data")
+	}
+	// Deco returns HTTP 200 with {"data":""} for an invalid session token.
+	if *req.Data == "" {
+		return ErrAuthentication
+	}
+	decoded, err := utils.AES256Decrypt(*req.Data, *c.aes)
 	if err != nil {
 		return err
 	}
@@ -175,6 +186,9 @@ func (c *Client) doPost(path string, params EndpointArgs, body []byte, result in
 
 	defer res.Body.Close()
 
+	if res.StatusCode == http.StatusUnauthorized || res.StatusCode == http.StatusForbidden {
+		return fmt.Errorf("%w: HTTP %d", ErrAuthentication, res.StatusCode)
+	}
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}

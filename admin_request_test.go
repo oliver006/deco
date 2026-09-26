@@ -114,7 +114,7 @@ func testAdminMethodCases(t *testing.T, cases []adminMethodCase) {
 				if err != nil {
 					t.Fatalf("%s: failed to encrypt response: %v", expected.name, err)
 				}
-				responseBody, err := json.Marshal(response{Data: encrypted})
+				responseBody, err := json.Marshal(response{Data: &encrypted})
 				if err != nil {
 					t.Fatalf("%s: failed to marshal response: %v", expected.name, err)
 				}
