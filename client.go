@@ -1,6 +1,7 @@
 package deco
 
 import (
+	"context"
 	"crypto/md5"
 	"crypto/rsa"
 	"encoding/base64"
@@ -28,11 +29,25 @@ var baseURL = url.URL{
 // Client is a client for sending requests to the Deco-m4 API
 type Client struct {
 	c        *http.Client
+	ctx      context.Context
 	aes      *utils.AESKey
 	rsa      *rsa.PublicKey
 	hash     string
 	stok     string
 	sequence uint
+}
+
+// WithContext returns a copy using ctx for HTTP requests. The copy shares the
+// authenticated session and HTTP client; canceling it does not cancel future
+// requests made through the original client. Do not authenticate concurrently
+// with requests using the same session.
+func (c *Client) WithContext(ctx context.Context) *Client {
+	if ctx == nil {
+		panic("nil Deco client context")
+	}
+	copy := *c
+	copy.ctx = ctx
+	return &copy
 }
 
 // ClientListResp is the structure of the client_list endpoint

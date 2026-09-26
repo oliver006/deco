@@ -2,6 +2,7 @@ package deco
 
 import (
 	"bytes"
+	"context"
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
@@ -171,7 +172,11 @@ func (c *Client) doEncryptedPost(path string, params EndpointArgs, body []byte, 
 
 func (c *Client) doPost(path string, params EndpointArgs, body []byte, result interface{}) error {
 	endpt := baseURL.ResolveReference(&url.URL{Path: path})
-	req, err := http.NewRequest("POST", endpt.String(), bytes.NewBuffer(body))
+	ctx := c.ctx
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", endpt.String(), bytes.NewBuffer(body))
 	if err != nil {
 		return err
 	}
